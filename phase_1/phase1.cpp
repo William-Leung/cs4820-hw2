@@ -1,38 +1,19 @@
 #include <iostream>
+#include <fstream>
 #include <algorithm>
 
 using namespace std;
 
-int main()
+struct entry
 {
-  int n, m;
-  cin >> n >> m;
+  int u;
+  int v;
+  int t;
+};
 
-  struct entry
-  {
-    int u;
-    int v;
-    int t;
-  };
-
-  struct entry log[m];
-  UnionFind forest = UnionFind(n);
-
-  // parsing entries into the log
-  for (int i = 0; i < m; i++)
-  {
-    cin >> log[i].u >> log[i].v >> log[i].t;
-    }
-
-  cout << "1 2" << endl;
-  cout << "2 3" << endl;
-  cout << "3 6" << endl;
-  cout << "3 5" << endl;
-  cout << "8 9" << endl;
-  cout << "6 7" << endl;
-  cout << "4 7" << endl;
-
-  return 0;
+bool compareEntry(entry e1, entry e2)
+{
+  return e1.t > e2.t;
 }
 
 class UnionFind
@@ -100,3 +81,32 @@ public:
     return find(e1) == find(e2);
   }
 };
+
+int main()
+{
+  int n, m;
+  cin >> n >> m;
+
+  entry log[m];
+  // parsing entries into the log
+  for (int i = 0; i < m; i++)
+  {
+    cin >> log[i].u >> log[i].v >> log[i].t;
+  }
+  sort(log, log + m, compareEntry);
+
+  UnionFind forest(n);
+
+  for (int i = 0; i < m; i++)
+  {
+    int e1 = log[i].u;
+    int e2 = log[i].v;
+    if (!forest.connected(e1, e2))
+    {
+      cout << e1 << " " << e2 << endl;
+      forest.merge(e1, e2);
+    }
+  }
+
+  return 0;
+}
