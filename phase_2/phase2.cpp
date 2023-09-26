@@ -3,37 +3,87 @@
 #include <vector>
 
 using namespace std;
-
-struct node
+struct edge
 {
   int v;
   int t;
-
-  node(int x, int y)
+  edge(int x, int y)
   {
     v = x;
     t = y;
   }
 };
 
+void query_helper(int u, int t_0, vector<int> &reached, vector<edge> adj[])
+{
+  reached[u] = 1;
+  for (int i = 0; i < adj[u].size(); i++)
+  {
+    edge e = adj[u][i];
+    if (e.t >= t_0 && !reached[e.v])
+    {
+      if (reached[e.v] != 1)
+        query_helper(e.v, t_0, reached, adj);
+    }
+  }
+}
+
 int main()
 {
+  bool debug = false;
   ifstream infile("p2.txt");
-
-  //=======Parsing======
+  // initial parsing
   int n, l, k;
-  infile >> n >> l >> k;
+  if (debug)
+    infile >> n >> l >> k;
+  else
+    cin >> n >> l >> k;
 
-  vector<node> adjacency[n];
+  // forming adjacency list
+  vector<edge> adjacency[n + 1];
 
-  // parsing forest
+  // parsing forest and forming adjacency list
   for (int i = 0; i < l; i++)
   {
     int u, v, t;
-    infile >> u >> v >> t;
-    adjacency[u].push_back(node(v, t));
-    adjacency[v].push_back(node(u, t));
+    if (debug)
+      infile >> u >> v >> t;
+    else
+      cin >> u >> v >> t;
+    adjacency[u].push_back(edge(v, t));
+    adjacency[v].push_back(edge(u, t));
   }
-  cout <<"h";
+
+  for (int i = 0; i < k; i++)
+  {
+    int u, t_0;
+    if (debug)
+      infile >> u >> t_0;
+    else
+      cin >> u >> t_0;
+
+    // array of reachable individuals
+    vector<int> reachable(n + 1, 0);
+    reachable[u] = 1;
+
+    query_helper(u, t_0, reachable, adjacency);
+
+    bool first = true;
+    for (int j = 1; j < reachable.size(); j++)
+    {
+      if (reachable[j] == 1)
+      {
+        if (first)
+        {
+          cout << j;
+          first = false;
+        }
+        else
+          cout << " " << j;
+      }
+    }
+    cout << endl;
+  }
+
   return 0;
 }
